@@ -1,317 +1,442 @@
-
 <!DOCTYPE html>
 <html lang="en">
-
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Crypto Analysis</title>
-    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600&display=swap" rel="stylesheet">
+    <link
+      href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600&display=swap"
+      rel="stylesheet"
+    />
+    <!-- Add Bootstrap CSS in the head section -->
+    <link
+      href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
 
     <style>
-        body {
-            font-family: 'Montserrat', sans-serif;
-            background-color: #f4f7f6;
-            margin: 0;
-            padding: 0;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-        }
+      body {
+        font-family: "Montserrat", sans-serif;
+        background-color: #f4f7f6;
+        margin: 0;
+        padding: 0;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+      }
 
-        h2 {
-            font-size: 24px;
-            margin-bottom: 20px;
-            color: #333;
-            text-align: center;
-        }
+      h2 {
+        font-size: 24px;
+        margin-bottom: 20px;
+        color: #333;
+        text-align: center;
+      }
 
-        label {
-            display: block;
-            font-weight: 600;
-            margin-bottom: 8px;
-            color: #555;
-        }
+      label {
+        display: block;
+        font-weight: 600;
+        margin-bottom: 8px;
+        color: #555;
+      }
 
+      .container {
+        max-width: 400px;
+        width: 100%;
+        background-color: white;
+        padding: 30px 20px;
+        border-radius: 15px;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+      }
+
+      input {
+        width: calc(100% - 20px);
+        padding: 12px 10px;
+        margin-bottom: 20px;
+        border: 1px solid #ddd;
+        border-radius: 8px;
+        font-size: 16px;
+        color: #333;
+        transition: all 0.3s ease;
+      }
+
+      input:focus {
+        border-color: #007bff;
+        box-shadow: 0 0 8px rgba(0, 123, 255, 0.2);
+        outline: none;
+      }
+
+      .button-container {
+        display: flex;
+        justify-content: space-between;
+      }
+
+      button {
+        width: calc(50% - 10px);
+        padding: 12px;
+        border: none;
+        border-radius: 8px;
+        font-size: 16px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s ease;
+      }
+
+      button.calculate-button {
+        background: linear-gradient(45deg, #28a745, #218838);
+        color: white;
+      }
+
+      button.calculate-button:hover {
+        background: linear-gradient(45deg, #218838, #28a745);
+        box-shadow: 0 4px 10px rgba(40, 167, 69, 0.2);
+      }
+
+      button.clear-button {
+        background: linear-gradient(45deg, #dc3545, #c82333);
+        color: white;
+      }
+
+      button.clear-button:hover {
+        background: linear-gradient(45deg, #c82333, #dc3545);
+        box-shadow: 0 4px 10px rgba(220, 53, 69, 0.2);
+      }
+
+      .result {
+        font-weight: 600;
+        font-size: 18px;
+        margin-top: 15px;
+      }
+
+      .profit {
+        color: #28a745;
+      }
+
+      .loss {
+        color: #dc3545;
+      }
+
+      .conversion-section {
+        margin-top: 15px;
+        padding-top: 15px;
+        border-top: 1px solid #eee;
+        display: none;
+      }
+
+      @media (max-width: 480px) {
         .container {
-            max-width: 400px;
-            width: 100%;
-            background-color: white;
-            padding: 30px 20px;
-            border-radius: 15px;
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
-        }
-
-        input {
-            width: calc(100% - 20px);
-            padding: 12px 10px;
-            margin-bottom: 20px;
-            border: 1px solid #ddd;
-            border-radius: 8px;
-            font-size: 16px;
-            color: #333;
-            transition: all 0.3s ease;
-        }
-
-        input:focus {
-            border-color: #007bff;
-            box-shadow: 0 0 8px rgba(0, 123, 255, 0.2);
-            outline: none;
-        }
-
-        .button-container {
-            display: flex;
-            justify-content: space-between;
+          padding: 20px;
         }
 
         button {
-            width: calc(50% - 10px);
-            padding: 12px;
-            border: none;
-            border-radius: 8px;
-            font-size: 16px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s ease;
+          font-size: 14px;
+        }
+      }
+
+      .toast {
+        visibility: hidden;
+        min-width: 250px;
+        margin-left: -125px;
+        background-color: #333;
+        color: #fff;
+        text-align: center;
+        border-radius: 2px;
+        padding: 16px;
+        position: fixed;
+        z-index: 1;
+        left: 50%;
+        bottom: 30px;
+        font-size: 17px;
+      }
+
+      .toast.show {
+        visibility: visible;
+        animation: fadein 0.5s, fadeout 0.5s 2.5s;
+      }
+
+      @keyframes fadein {
+        from {
+          bottom: 0;
+          opacity: 0;
         }
 
-        button.calculate-button {
-            background: linear-gradient(45deg, #28a745, #218838);
-            color: white;
+        to {
+          bottom: 30px;
+          opacity: 1;
+        }
+      }
+
+      @keyframes fadeout {
+        from {
+          bottom: 30px;
+          opacity: 1;
         }
 
-        button.calculate-button:hover {
-            background: linear-gradient(45deg, #218838, #28a745);
-            box-shadow: 0 4px 10px rgba(40, 167, 69, 0.2);
+        to {
+          bottom: 0;
+          opacity: 0;
         }
+      }
 
-        button.clear-button {
-            background: linear-gradient(45deg, #dc3545, #c82333);
-            color: white;
-        }
+      .toast-profit {
+        background-color: #28a745;
+      }
 
-        button.clear-button:hover {
-            background: linear-gradient(45deg, #c82333, #dc3545);
-            box-shadow: 0 4px 10px rgba(220, 53, 69, 0.2);
-        }
-
-        .result {
-            font-weight: 600;
-            font-size: 18px;
-            margin-top: 15px;
-        }
-
-        .profit {
-            color: #28a745;
-        }
-
-        .loss {
-            color: #dc3545;
-        }
-
-        .conversion-section {
-            margin-top: 15px;
-            padding-top: 15px;
-            border-top: 1px solid #eee;
-            display: none;
-        }
-
-        @media (max-width: 480px) {
-            .container {
-                padding: 20px;
-            }
-
-            button {
-                font-size: 14px;
-            }
-        }
-
-        .toast {
-            visibility: hidden;
-            min-width: 250px;
-            margin-left: -125px;
-            background-color: #333;
-            color: #fff;
-            text-align: center;
-            border-radius: 2px;
-            padding: 16px;
-            position: fixed;
-            z-index: 1;
-            left: 50%;
-            bottom: 30px;
-            font-size: 17px;
-        }
-
-        .toast.show {
-            visibility: visible;
-            animation: fadein 0.5s, fadeout 0.5s 2.5s;
-        }
-
-        @keyframes fadein {
-            from {
-                bottom: 0;
-                opacity: 0;
-            }
-
-            to {
-                bottom: 30px;
-                opacity: 1;
-            }
-        }
-
-        @keyframes fadeout {
-            from {
-                bottom: 30px;
-                opacity: 1;
-            }
-
-            to {
-                bottom: 0;
-                opacity: 0;
-            }
-        }
-
-        .toast-profit {
-            background-color: #28a745;
-        }
-
-        .toast-loss {
-            background-color: #dc3545;
-        }
+      .toast-loss {
+        background-color: #dc3545;
+      }
     </style>
-</head>
+  </head>
 
-<body>
+  <body>
     <div class="container">
-        <label for="initialValue">Initial Coin Value:</label>
-        <input type="number" id="initialValue" placeholder="Enter initial value" required>
+      <!-- Tabs navigation -->
+      <ul class="nav nav-pills" id="cryptoTabs" role="tablist">
+        <li class="nav-item">
+          <a
+            class="nav-link active"
+            id="calculator-tab"
+            data-toggle="tab"
+            href="#calculator"
+            role="tab"
+            aria-controls="calculator"
+            aria-selected="true"
+            >Calculator</a
+          >
+        </li>
+        <li class="nav-item">
+          <a
+            class="nav-link"
+            id="analysis-tab"
+            data-toggle="tab"
+            href="#analysis"
+            role="tab"
+            aria-controls="analysis"
+            aria-selected="false"
+            >Analysis</a
+          >
+        </li>
+      </ul>
 
-        <label for="shootValue">Target Coin Value:</label>
-        <input type="number" id="shootValue" placeholder="Enter target value" required>
+      <div class="tab-content" id="cryptoTabsContent">
+        <div
+          class="tab-pane fade show active"
+          id="calculator"
+          role="tabpanel"
+          aria-labelledby="calculator-tab"
+        >
+          <br />
+          <label for="initialValue">Initial Coin Value:</label>
+          <input
+            type="number"
+            id="initialValue"
+            placeholder="Enter initial value"
+            required
+          />
 
-        <label for="investment">Investment (USDT):</label>
-        <input type="number" id="investment" placeholder="Enter investment amount" required>
+          <label for="shootValue">Target Coin Value:</label>
+          <input
+            type="number"
+            id="shootValue"
+            placeholder="Enter target value"
+            required
+          />
 
-        <label for="usdToPkr">USD to PKR Conversion Rate:</label>
-        <input type="number" id="usdToPkr" placeholder="Enter conversion rate" value="290" required>
+          <label for="investment">Investment (USDT):</label>
+          <input
+            type="number"
+            id="investment"
+            placeholder="Enter investment amount"
+            required
+          />
 
-        <div class="button-container">
-            <button class="calculate-button" onclick="calculateProfit()">Calculate</button>
+          <label for="usdToPkr">USD to PKR Conversion Rate:</label>
+          <input
+            type="number"
+            id="usdToPkr"
+            placeholder="Enter conversion rate"
+            value="290"
+            required
+          />
+
+          <div class="button-container">
+            <button class="calculate-button" onclick="calculateProfit()">
+              Calculate
+            </button>
             <button class="clear-button" onclick="clearFields()">Clear</button>
-        </div>
+          </div>
 
-        <p class="result" id="result"></p>
-        <p class="result" id="totalAssets"></p>
-        <p class="result" id="percentProfit"></p>
+          <p class="result" id="result"></p>
+          <p class="result" id="totalAssets"></p>
+          <p class="result" id="percentProfit"></p>
 
-        <div class="conversion-section">
+          <div class="conversion-section">
             <b>
-                <h3>PKR Conversion:</h3>
+              <h3>PKR Conversion:</h3>
             </b>
             <p class="result" id="totalInvestmentPKR"></p>
             <p class="result" id="resultPKR"></p>
             <p class="result" id="totalAssetsPKR"></p>
+          </div>
         </div>
+
+        <div
+          class="tab-pane fade"
+          id="analysis"
+          role="tabpanel"
+          aria-labelledby="analysis-tab"
+        >
+          <br />
+          <h2>Analysis Section</h2>
+          <!-- Analysis content will be added here -->
+        </div>
+      </div>
     </div>
- 
+
+    <!-- Add Bootstrap and Popper.js in the body section before closing body tag -->
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.2/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+
     <script>
-        document.addEventListener("DOMContentLoaded", function () {
-            document.querySelector('.conversion-section').style.display = 'none';
-        });
+      document.addEventListener("DOMContentLoaded", function () {
+        document.querySelector(".conversion-section").style.display = "none";
+      });
 
-        function showToast(message, isProfit) {
-            var toast = document.createElement('div');
-            toast.className = 'toast';
-            toast.textContent = message;
+      function showToast(message, isProfit) {
+        var toast = document.createElement("div");
+        toast.className = "toast";
+        toast.textContent = message;
 
-            if (isProfit) {
-                toast.classList.add('toast-profit');
-            } else {
-                toast.classList.add('toast-loss');
-            }
-
-            document.body.appendChild(toast);
-            toast.classList.add('show');
-
-            setTimeout(function () {
-                toast.classList.remove('show');
-                document.body.removeChild(toast);
-            }, 3000);
+        if (isProfit) {
+          toast.classList.add("toast-profit");
+        } else {
+          toast.classList.add("toast-loss");
         }
 
-        function calculateProfit() {
-            var initialValue = parseFloat(document.getElementById('initialValue').value);
-            var investment = parseFloat(document.getElementById('investment').value);
-            var shootValue = parseFloat(document.getElementById('shootValue').value);
-            var usdToPkr = parseFloat(document.getElementById('usdToPkr').value);
+        document.body.appendChild(toast);
+        toast.classList.add("show");
 
-            if (isNaN(initialValue) || isNaN(investment) || isNaN(shootValue) || isNaN(usdToPkr)) {
-                alert('Please enter valid numbers in all fields.');
-                return;
-            }
+        setTimeout(function () {
+          toast.classList.remove("show");
+          document.body.removeChild(toast);
+        }, 3000);
+      }
 
-            var totalCoins = investment / initialValue;
-            var profitPerCoin = shootValue - initialValue;
-            var totalProfit = totalCoins * profitPerCoin;
-            var totalAssets = investment + totalProfit;
-            var percentProfit = (totalProfit / investment) * 100;
+      function calculateProfit() {
+        var initialValue = parseFloat(
+          document.getElementById("initialValue").value
+        );
+        var investment = parseFloat(
+          document.getElementById("investment").value
+        );
+        var shootValue = parseFloat(
+          document.getElementById("shootValue").value
+        );
+        var usdToPkr = parseFloat(document.getElementById("usdToPkr").value);
 
-            var totalProfitPKR = totalProfit * usdToPkr;
-            var totalAssetsPKR = totalAssets * usdToPkr;
-            var totalInvestmentPKR = investment * usdToPkr;
-
-            var resultElement = document.getElementById('result');
-            var totalAssetsElement = document.getElementById('totalAssets');
-            var percentProfitElement = document.getElementById('percentProfit');
-            var resultPKRElement = document.getElementById('resultPKR');
-            var totalAssetsPKRElement = document.getElementById('totalAssetsPKR');
-            var totalInvestmentPKRElement = document.getElementById('totalInvestmentPKR');
-            var conversionSection = document.querySelector('.conversion-section');
-
-            if (totalProfit >= 0) {
-                resultElement.textContent = 'Total Profit: ' + Math.round(totalProfit).toLocaleString() + ' USD';
-                resultElement.className = 'result profit';
-                percentProfitElement.textContent = 'Percentage Profit: ' + percentProfit.toFixed(2) + '%';
-                percentProfitElement.className = 'result profit';
-
-                resultPKRElement.textContent = 'Total Profit: ' + Math.round(totalProfitPKR).toLocaleString() + ' PKR';
-                resultPKRElement.className = 'result profit';
-
-                showToast('Profit Achieved! ' + Math.round(totalProfit).toLocaleString() + ' USD', true);
-            } else {
-                resultElement.textContent = 'Total Loss: ' + Math.abs(Math.round(totalProfit)).toLocaleString() + ' USD';
-                resultElement.className = 'result loss';
-                percentProfitElement.textContent = 'Percentage Loss: ' + Math.abs(percentProfit).toFixed(2) + '%';
-                percentProfitElement.className = 'result loss';
-
-                resultPKRElement.textContent = 'Total Loss: ' + Math.abs(Math.round(totalProfitPKR)).toLocaleString() + ' PKR';
-                resultPKRElement.className = 'result loss';
-
-                showToast('Loss Incurred! ' + Math.abs(Math.round(totalProfit)).toLocaleString() + ' USD', false);
-            }
-
-            totalAssetsElement.textContent = 'Total Assets: ' + Math.round(totalAssets).toLocaleString() + ' USD';
-            totalAssetsPKRElement.textContent = 'Final Value: ' + Math.round(totalAssetsPKR).toLocaleString() + ' PKR';
-            totalInvestmentPKRElement.textContent = 'Total Investment: ' + Math.round(totalInvestmentPKR).toLocaleString() + ' PKR';
-
-            conversionSection.style.display = 'block';
+        if (
+          isNaN(initialValue) ||
+          isNaN(investment) ||
+          isNaN(shootValue) ||
+          isNaN(usdToPkr)
+        ) {
+          alert("Please enter valid numbers in all fields.");
+          return;
         }
 
-        function clearFields() {
-            document.getElementById('initialValue').value = '';
-            document.getElementById('investment').value = '';
-            document.getElementById('shootValue').value = '';
-            document.getElementById('usdToPkr').value = '290';
-            document.getElementById('result').textContent = '';
-            document.getElementById('totalAssets').textContent = '';
-            document.getElementById('percentProfit').textContent = '';
-            document.getElementById('resultPKR').textContent = '';
-            document.getElementById('totalAssetsPKR').textContent = '';
-            document.querySelector('.conversion-section').style.display = 'none';
-            document.getElementById('initialValue').focus();
+        var totalCoins = investment / initialValue;
+        var profitPerCoin = shootValue - initialValue;
+        var totalProfit = totalCoins * profitPerCoin;
+        var totalAssets = investment + totalProfit;
+        var percentProfit = (totalProfit / investment) * 100;
+
+        var totalProfitPKR = totalProfit * usdToPkr;
+        var totalAssetsPKR = totalAssets * usdToPkr;
+        var totalInvestmentPKR = investment * usdToPkr;
+
+        var resultElement = document.getElementById("result");
+        var totalAssetsElement = document.getElementById("totalAssets");
+        var percentProfitElement = document.getElementById("percentProfit");
+        var resultPKRElement = document.getElementById("resultPKR");
+        var totalAssetsPKRElement = document.getElementById("totalAssetsPKR");
+        var totalInvestmentPKRElement =
+          document.getElementById("totalInvestmentPKR");
+        var conversionSection = document.querySelector(".conversion-section");
+
+        if (totalProfit >= 0) {
+          resultElement.textContent =
+            "Total Profit: " +
+            Math.round(totalProfit).toLocaleString() +
+            " USD";
+          resultElement.className = "result profit";
+          percentProfitElement.textContent =
+            "Percentage Profit: " + percentProfit.toFixed(2) + "%";
+          percentProfitElement.className = "result profit";
+
+          resultPKRElement.textContent =
+            "Total Profit: " +
+            Math.round(totalProfitPKR).toLocaleString() +
+            " PKR";
+          resultPKRElement.className = "result profit";
+
+          showToast(
+            "Profit Achieved! " +
+              Math.round(totalProfit).toLocaleString() +
+              " USD",
+            true
+          );
+        } else {
+          resultElement.textContent =
+            "Total Loss: " +
+            Math.abs(Math.round(totalProfit)).toLocaleString() +
+            " USD";
+          resultElement.className = "result loss";
+          percentProfitElement.textContent =
+            "Percentage Loss: " + Math.abs(percentProfit).toFixed(2) + "%";
+          percentProfitElement.className = "result loss";
+
+          resultPKRElement.textContent =
+            "Total Loss: " +
+            Math.abs(Math.round(totalProfitPKR)).toLocaleString() +
+            " PKR";
+          resultPKRElement.className = "result loss";
+
+          showToast(
+            "Loss Incurred! " +
+              Math.abs(Math.round(totalProfit)).toLocaleString() +
+              " USD",
+            false
+          );
         }
+
+        totalAssetsElement.textContent =
+          "Total Assets: " + Math.round(totalAssets).toLocaleString() + " USD";
+        totalAssetsPKRElement.textContent =
+          "Final Value: " +
+          Math.round(totalAssetsPKR).toLocaleString() +
+          " PKR";
+        totalInvestmentPKRElement.textContent =
+          "Total Investment: " +
+          Math.round(totalInvestmentPKR).toLocaleString() +
+          " PKR";
+
+        conversionSection.style.display = "block";
+      }
+
+      function clearFields() {
+        document.getElementById("initialValue").value = "";
+        document.getElementById("investment").value = "";
+        document.getElementById("shootValue").value = "";
+        document.getElementById("usdToPkr").value = "290";
+        document.getElementById("result").textContent = "";
+        document.getElementById("totalAssets").textContent = "";
+        document.getElementById("percentProfit").textContent = "";
+        document.getElementById("resultPKR").textContent = "";
+        document.getElementById("totalAssetsPKR").textContent = "";
+        document.querySelector(".conversion-section").style.display = "none";
+        document.getElementById("initialValue").focus();
+      }
     </script>
-</body>
-
+  </body>
 </html>
